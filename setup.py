@@ -32,8 +32,8 @@ def read_dependencies(requirements=missing):
         text.close()
 
 
-def read_version(version_file):
-    with open(version_file, 'rb') as fd:
+def read_version(module_name):
+    with open(os.path.join(module_name, '__init__.py'), 'rb') as fd:
         result = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                            fd.read(), re.MULTILINE)
         return result.group(1) if result else '0.0.1'
@@ -41,7 +41,7 @@ def read_version(version_file):
 
 setup(
     name='flask_kits',
-    version=read_version('flask_kits/__init__.py'),
+    version=read_version('flask_kits'),
     license='The MIT License',
     description='demo',
     author='recipe',
