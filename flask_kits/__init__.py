@@ -22,8 +22,8 @@ class Kits(object):
     PREFIX = 'KITS'
 
     def __init__(self, app=None, **kwargs):
-        from flask import Flask
-        Flask.url_rule_class = KitRule
+        # from flask import Flask
+        # Flask.url_rule_class = KitRule
         self._app = None
         self.app_name = 'recipe'
         self._options = {}
@@ -38,10 +38,10 @@ class Kits(object):
         if not hasattr(app, 'extensions'):
             app.extensions = {}
 
-        jsapi.init_extension(self, app)
-        wxapi.init_extension(self, app)
-        sms.init_extension(self, app)
-        tm.init_extension(self, app)
+            # jsapi.init_extension(self, app)
+            # wxapi.init_extension(self, app)
+            # sms.init_extension(self, app)
+            # tm.init_extension(self, app)
 
     def get_parameter(self, name, default=None):
         option = self._options.get(name, missing)

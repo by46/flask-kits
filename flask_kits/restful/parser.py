@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from dateutil.parser import parse
 
 LITERAL = {'false': False, 'true': True}
@@ -22,3 +24,10 @@ def compatible_bool(value):
 
 def compatible_datetime(value, name):
     return parse(value)
+
+
+def compatible_decimal(value):
+    try:
+        return Decimal(value)
+    except Exception:
+        return None
