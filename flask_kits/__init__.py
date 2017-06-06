@@ -3,14 +3,7 @@
 
 """
 
-from flask_kits import jsapi
-from flask_kits import sms
-from flask_kits import tm
-from flask_kits import wxapi
-from flask_kits.jsapi import JsApi
 from flask_kits.routing import KitRule
-from flask_kits.sms import SMS
-from flask_kits.tm import current_tm
 
 __author__ = 'benjamin.c.yan'
 __version__ = '0.0.1'
