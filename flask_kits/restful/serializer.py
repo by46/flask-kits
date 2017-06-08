@@ -5,6 +5,7 @@ from six import add_metaclass
 
 from flask_kits.restful import Paginate
 from flask_kits.restful import filter_params
+from .swagger import post_parameter
 
 MAPPING = {
     'integer': fields.Integer
@@ -49,13 +50,16 @@ class Serializer(object):
         def decorator(func):
             attr = func.__dict__['__swagger_attr']
             params = attr.get('parameters', [])
-            params.append({
-                "name": name,
-                "description": description or name,
-                "required": required,
-                "dataType": data_type,
-                "paramType": param_type
-            })
+            if type(data_type).__name__ == 'type' and issubclass(data_type, cls):
+                params.append(post_parameter(data_type))
+            else:
+                params.append({
+                    "name": name,
+                    "description": description or name,
+                    "required": required,
+                    "dataType": str(data_type),
+                    "paramType": param_type
+                })
             attr['parameters'] = params
             return func
 
