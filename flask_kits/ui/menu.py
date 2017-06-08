@@ -18,7 +18,13 @@ def visible_when(roles):
         return True
 
     actual_roles = set(roles)
-    expect_roles = set([role.name for role in current_user.roles])
+    expect_roles = set()
+    if hasattr(current_user, 'role'):
+        expect_roles.add(current_user.role.name)
+
+    if hasattr(current_user, 'roles'):
+        for role in current_user.roles:
+            expect_roles.add(role.name)
     return actual_roles & expect_roles
 
 

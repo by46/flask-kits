@@ -33,7 +33,7 @@ def read_dependencies(requirements=missing):
 
 
 def read_version(module_name):
-    with open(os.path.join(module_name, '__init__.py'), 'rb') as fd:
+    with open(os.path.join(module_name, '__init__.py'), 'r') as fd:
         result = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                            fd.read(), re.MULTILINE)
         return result.group(1) if result else '0.0.1'

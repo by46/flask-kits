@@ -4,5 +4,7 @@ Flask
 Flask-Login
 Flask-Menu
 Flask-Restful
+Flask-Restful-Swagger
 Flask-SQLAlchemy
 Furl
+Six

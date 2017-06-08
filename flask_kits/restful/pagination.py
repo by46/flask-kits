@@ -1,7 +1,4 @@
 from functools import wraps
-from itertools import izip
-from urlparse import urlparse
-from urlparse import urlunsplit
 
 from flask import abort
 from flask import has_request_context
@@ -12,7 +9,9 @@ from flask_restful import marshal_with
 from flask_restful.utils import unpack
 from flask_sqlalchemy import BaseQuery
 from flask_sqlalchemy import Pagination
-from furl import furl
+from six.moves import zip
+from six.moves.urllib_parse import urlparse
+from six.moves.urllib_parse import urlunsplit
 
 
 def paginate(query, page=None, per_page=None, error_out=True):
@@ -130,7 +129,7 @@ class Paginate(marshal_with):
             pagination_list = [paginate(q) for q in query.results]
             items_list = [p.items for p in pagination_list]
             pagination = pagination_list[0]
-            pagination.items =[self.item_builder(record) for record in izip(*items_list)]
+            pagination.items = [self.item_builder(record) for record in zip(*items_list)]
 
         else:
             if isinstance(query, BaseQuery):
