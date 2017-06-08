@@ -86,3 +86,9 @@ class Serializer(object):
 
     def __repr__(self):
         return self.__class__.__name__
+
+
+class LocalDateTime(fields.DateTime):
+    def format(self, value):
+        result = super(LocalDateTime, self).format(value)
+        return result.replace('T', ' ')
