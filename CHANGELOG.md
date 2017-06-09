@@ -1,5 +1,9 @@
 # Change log
 
+## [0.0.4]
+### Added
+- Add auto serializer
+
 ## [0.0.3]
 ### Added
 - Add support flask-menu

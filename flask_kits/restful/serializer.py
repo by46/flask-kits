@@ -7,8 +7,18 @@ from flask_kits.restful import Paginate
 from flask_kits.restful import filter_params
 from .swagger import post_parameter
 
+
+class LocalDateTime(fields.DateTime):
+    def format(self, value):
+        result = super(LocalDateTime, self).format(value)
+        return result.replace('T', ' ')
+
+
 MAPPING = {
-    'integer': fields.Integer
+    'integer': fields.Integer,
+    'boolean': fields.Boolean,
+    'date': LocalDateTime(dt_format='iso8601'),
+    'datetime': LocalDateTime(dt_format='iso8601')
 }
 
 
@@ -50,6 +60,7 @@ class Serializer(object):
         def decorator(func):
             attr = func.__dict__['__swagger_attr']
             params = attr.get('parameters', [])
+            # TODO(benjamin): check data_type type
             if type(data_type).__name__ == 'type' and issubclass(data_type, cls):
                 params.append(post_parameter(data_type))
             else:
@@ -86,9 +97,3 @@ class Serializer(object):
 
     def __repr__(self):
         return self.__class__.__name__
-
-
-class LocalDateTime(fields.DateTime):
-    def format(self, value):
-        result = super(LocalDateTime, self).format(value)
-        return result.replace('T', ' ')
