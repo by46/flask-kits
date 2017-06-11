@@ -1,5 +1,10 @@
 # Change log
 
+## [0.0.6]
+### Added
+- Add auto serializer
+- fix menu bug
+
 ## [0.0.4]
 ### Added
 - Add auto serializer

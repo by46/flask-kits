@@ -58,7 +58,7 @@ def config_menu(app, items):
             name = item.pop('name')
             menu_item = current_menu.submenu(name)  # type: MenuEntryMixin
             item.endpoint = None
-            item.visible_when = partial(visible_when, menu_item)
+            item.visible_when = partial(visible_when, item.get('roles'))
             # kwargs['active_when'] = active_when
             menu_item.register(**item)
 
@@ -74,5 +74,6 @@ def register_menu_ex(app, path, text, **kwargs):
     new_visible_when = partial(visible_when, kwargs.get('roles'))
     kwargs['visible_when'] = new_visible_when
     return register_menu(app, path, text, **kwargs)
+
 
 register_menu = partial(register_menu, visible_when=visible_when)
