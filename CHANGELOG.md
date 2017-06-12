@@ -1,5 +1,9 @@
 # Change log
 
+## [0.0.7]
+### Fix
+- change parameter decorator
+
 ## [0.0.6]
 ### Added
 - Add auto serializer

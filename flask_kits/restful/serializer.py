@@ -74,7 +74,8 @@ class Serializer(object):
             attr = func.__dict__['__swagger_attr']
             params = attr.get('parameters', [])
             # TODO(benjamin): check data_type type
-            if inspect.isclass(data_type) and issubclass(data_type, cls):
+            # if inspect.isclass(data_type) and issubclass(data_type, cls):
+            if hasattr(data_type, 'resource_fields'):
                 params.append(post_parameter(data_type))
             else:
                 params.append({

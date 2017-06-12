@@ -6,7 +6,7 @@
 from flask_kits.routing import KitRule
 
 __author__ = 'benjamin.c.yan'
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 missing = object()
 
