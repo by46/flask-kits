@@ -45,7 +45,7 @@ setup(
     license='The MIT License',
     description='demo',
     author='recipe',
-    author_email='recipe@newegg.com',
+    author_email='ycs_ctbu_2010@126.com',
     install_requires=read_dependencies(),
     include_package_data=True,
     packages=find_packages(),

@@ -4,9 +4,10 @@
 """
 
 from flask_kits.routing import KitRule
+from . import sms
 
 __author__ = 'benjamin.c.yan'
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 missing = object()
 
@@ -30,11 +31,7 @@ class Kits(object):
 
         if not hasattr(app, 'extensions'):
             app.extensions = {}
-
-            # jsapi.init_extension(self, app)
-            # wxapi.init_extension(self, app)
-            # sms.init_extension(self, app)
-            # tm.init_extension(self, app)
+        sms.init_extension(self, app)
 
     def get_parameter(self, name, default=None):
         option = self._options.get(name, missing)
