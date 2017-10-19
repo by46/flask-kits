@@ -1,3 +1,6 @@
+"""
+swagger: http://127.0.0.1:5000/api/spec.html
+"""
 from flask import Flask
 from flask_restful import Api
 from flask_restful import Resource
@@ -6,6 +9,10 @@ from flask_restful_swagger import swagger
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_kits.restful import Serializer
+from flask_kits.restful.entity import EntityBase
+from flask_kits.restful.entity import Field
+from flask_kits.restful.entity import MoreValidator
+from flask_restful_swagger.swagger import _Nested
 
 config = {
     'SQLALCHEMY_DATABASE_URI': "mysql+pymysql://root:root@10.16.76.245:3306/coffee"
@@ -15,6 +22,21 @@ app = Flask(__name__)
 app.config.from_mapping(config)
 api = swagger.docs(Api(app), apiVersion="1.0")
 db = SQLAlchemy(app)
+
+
+class Code(EntityBase):
+    Code = Field('Code', type=int)
+
+
+class Address(EntityBase):
+    Zip = Field("Zip", type=int)
+    Detail = Field('Detail', type=Code)
+
+
+class Entity(EntityBase):
+    Name = Field('Name', location='json')
+    Age = Field("Age", location='json', type=int, validators=[MoreValidator(40)])
+    Address = Field("Address", type=Address)
 
 
 class User(db.Model):
@@ -44,6 +66,15 @@ class UserApi(Resource):
 
 api.add_resource(UserApi, '/users')
 
+
+class User2Api(Resource):
+    @Entity.parameter
+    @UserSerializer.single
+    def post(self, entity):
+        print(entity, entity.Address.Zip)
+
+
+api.add_resource(User2Api, '/users2')
 if __name__ == '__main__':
-    print(app.url_map)
+    # print(app.url_map)
     app.run()
