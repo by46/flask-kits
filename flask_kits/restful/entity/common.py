@@ -127,9 +127,6 @@ class EntityBase(dict):
         """
         return True
 
-    def handle_error(self):
-        pass
-
 
 class Field(Argument):
     def __init__(self, name, *args, **kwargs):

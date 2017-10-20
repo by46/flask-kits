@@ -1,6 +1,5 @@
 from .common import EntityBase
 from .common import Field
-from .decorator import parameter
 from .response import Response
 from .validator import LetterValidator
 from .validator import MaxLengthValidator
