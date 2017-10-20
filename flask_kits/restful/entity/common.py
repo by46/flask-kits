@@ -25,11 +25,12 @@ MAPPINGS = {
 }
 
 
+# optimize this code
 def get_field_type(class_type):
     return MAPPINGS.get(class_type)
 
 
-class DeclarativeMeta(type):
+class EntityDeclarative(type):
     def __new__(cls, class_name, bases, attributes):
         if class_name == 'EntityBase':
             return type.__new__(cls, class_name, bases, attributes)
@@ -41,14 +42,13 @@ class DeclarativeMeta(type):
         resource_fields = dict()
         for key, field in fields:
             if inspect.isclass(field.type) and issubclass(field.type, EntityBase):
-                resource_fields[key] = flask_restful.fields.Nested({'Name2': flask_restful.fields.String})
+                resource_fields[key] = flask_restful.fields.Nested(field.type.resource_fields)
                 field.type = field.type.parse
                 field.location = 'json'
             else:
                 resource_fields[key] = get_field_type(field.type)
             parser.add_argument(field)
             field_names.add(key)
-            # resource_fields[key] = get_field_type(field.type)
             del attributes[key]
         attributes['entity_parser'] = parser
         attributes['entity_fields'] = field_names
@@ -72,7 +72,7 @@ class WrappedDict(dict):
         return None
 
 
-@add_metaclass(DeclarativeMeta)
+@add_metaclass(EntityDeclarative)
 class EntityBase(dict):
     def __getattr__(self, name):
         try:
@@ -133,6 +133,7 @@ class EntityBase(dict):
 
 class Field(Argument):
     def __init__(self, name, *args, **kwargs):
+        kwargs.setdefault('type', text_type)
         self.validators = set()
         if 'validators' in kwargs:
             self.validators = kwargs.pop('validators')

@@ -11,8 +11,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_kits.restful import Serializer
 from flask_kits.restful.entity import EntityBase
 from flask_kits.restful.entity import Field
+from flask_kits.restful.entity import MaxLengthValidator
+from flask_kits.restful.entity import MinLengthValidator
 from flask_kits.restful.entity import MoreValidator
-from flask_restful_swagger.swagger import _Nested
+from flask_kits.restful.entity import Response
 
 config = {
     'SQLALCHEMY_DATABASE_URI': "mysql+pymysql://root:root@10.16.76.245:3306/coffee"
@@ -35,8 +37,8 @@ class Address(EntityBase):
 
 class Entity(EntityBase):
     Name = Field('Name', location='json')
-    Age = Field("Age", location='json', type=int, validators=[MoreValidator(40)])
-    Address = Field("Address", type=Address)
+    Age = Field("Age", location='json', type=int, action='append', validators=[MoreValidator(40)])
+    Address = Field("Address", type=Address, action='append')
 
 
 class User(db.Model):
@@ -51,6 +53,14 @@ class UserSerializer(Serializer):
     __exclude_fields__ = ['password_hash']
     __include_fields__ = {'is_administrator': fields.Boolean}
     __new_entity_fields__ = ['name', ('age', fields.Boolean)]
+
+
+class UserResponse(Response):
+    __model__ = User
+    __exclude_fields__ = ['Name']
+    Name = fields.String
+    Password = fields.String
+    ID = fields.Integer
 
 
 class UserApi(Resource):
@@ -71,10 +81,26 @@ class User2Api(Resource):
     @Entity.parameter
     @UserSerializer.single
     def post(self, entity):
-        print(entity, entity.Address.Zip)
+        print(entity, entity)
 
 
 api.add_resource(User2Api, '/users2')
+
+
+class LoginUser(EntityBase):
+    Name = Field('Name', validators=[MinLengthValidator(10)])
+    LoginID = Field('LoginID', validators=[MinLengthValidator(2), MaxLengthValidator(20)])
+    Password = Field("Password", validators=[MinLengthValidator(8), MaxLengthValidator(16)])
+
+
+class User3Api(Resource):
+    @LoginUser.parameter
+    @UserResponse.single
+    def post(self, entity):
+        print(entity)
+
+
+api.add_resource(User3Api, '/users3')
 if __name__ == '__main__':
     # print(app.url_map)
     app.run()

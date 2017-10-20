@@ -70,3 +70,8 @@ class PrecisionValidator(CompareValidator):
         :param Decimal value:
         """
         return value.quantize(Decimal('1.' + (self.threshold * '0'))) != value
+
+
+class PasswordValidator(Validator):
+    def validate(self, value):
+        return True

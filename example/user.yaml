@@ -1,0 +1,72 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: Simaple API
+  description: a simple API
+
+schemes:
+  - https
+host: simple.api
+basePath: /openapi
+
+paths:
+  /persions:
+    get:
+      summary: Gets some person
+      description: returns a list
+      parameters:
+        - name: pageSize
+          in: query
+          description:  number of person
+          type: integer
+        - $ref: '#/parameters/pageSize'
+
+      responses:
+        200:
+          description: a list
+          schema:
+            $ref: '#/definitions/Persons'
+  /person/{username}:
+    get:
+      summary: Get one person
+      responses:
+        200:
+          description: The person's username
+          schema:
+            $ref: '#/definitions/Person'
+        500:
+          $ref: '#/responses/Standard500ErrorResponse'
+
+definitions:
+  Person:
+    required:
+      - username
+    properties:
+      username:
+        type: string
+
+  Persons:
+    type: array
+    items:
+      $ref: '#/definitions/Person'
+
+  Error:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+
+responses:
+  Standard500ErrorResponse:
+    description:  An unexpect error occured
+    schema:
+        $ref: '#/definitions/Error'
+
+parameters:
+  pageSize:
+    name: pageSize
+    in: query
+    description: Number of persons returned
+    type: integer

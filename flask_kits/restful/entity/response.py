@@ -1,11 +1,13 @@
 from flask_restful import fields
 from flask_restful import marshal_with
+from flask_restful.fields import Raw
 from flask_restful_swagger import swagger
 from six import add_metaclass
+from six import iteritems
 
 from flask_kits.restful import Paginate
 from flask_kits.restful import filter_params
-from .swagger import post_parameter
+from flask_kits.restful.swagger import post_parameter
 
 
 class LocalDateTime(fields.DateTime):
@@ -20,22 +22,27 @@ MAPPING = {
     'date': LocalDateTime(dt_format='iso8601'),
     'datetime': LocalDateTime(dt_format='iso8601')
 }
+MAPPINGS = {
+
+}
+"""
+integer
+number
+string
+boolean
+"""
 
 
-class SerializerMetaclass(type):
+class ResponseDeclarative(type):
     def __new__(cls, name, bases, attributes):
-        if name == 'Serializer':
+        if name == 'Response':
             return type.__new__(cls, name, bases, attributes)
 
         model = attributes.pop('__model__', None)  # type: User
         exclude_fields = attributes.pop('__exclude_fields__', [])
-        include_fields = attributes.pop('__include_fields__', {})
-        new_entity_fields = attributes.pop('__new_entity_fields__', [])
         class_dict = attributes.copy()
         class_dict['resource_fields'] = resource_fields = {}
         class_dict['exclude_fields'] = exclude_fields
-        class_dict['include_fields'] = include_fields
-        class_dict['new_entity_fields'] = new_entity_fields
         if model:
             for column in model.__table__.columns:
                 if column.name in exclude_fields:
@@ -45,16 +52,16 @@ class SerializerMetaclass(type):
                 if not field_type:
                     field_type = fields.String
                 resource_fields[column.name] = field_type
-
-            if include_fields:
-                resource_fields.update(include_fields)
+        extra_fields = {name: field for name, field in iteritems(attributes) if
+                        not name.startswith('_') and issubclass(field, Raw)}
+        resource_fields.update(extra_fields)
         s = type.__new__(cls, name, bases, class_dict)
         swagger.add_model(s)
         return s
 
 
-@add_metaclass(SerializerMetaclass)
-class Serializer(object):
+@add_metaclass(ResponseDeclarative)
+class Response(object):
     @classmethod
     def operation(cls, f, paginate=True):
         attr = {
@@ -71,8 +78,6 @@ class Serializer(object):
         def decorator(func):
             attr = func.__dict__['__swagger_attr']
             params = attr.get('parameters', [])
-            # TODO(benjamin): check data_type type
-            # if inspect.isclass(data_type) and issubclass(data_type, cls):
             if hasattr(data_type, 'resource_fields'):
                 params.append(post_parameter(data_type))
             else:
@@ -113,7 +118,7 @@ class Serializer(object):
     @classmethod
     def list(cls, item_builder=None):
         def decorator(func):
-            wrapper = Paginate(cls.default_serializer(), item_builder=item_builder)
+            wrapper = Paginate(cls.resource_fields, item_builder=item_builder)
             wrapper = wrapper(func)
             wrapper.__dict__['__swagger_attr'] = cls.operation(func)
             return wrapper
@@ -122,13 +127,9 @@ class Serializer(object):
 
     @classmethod
     def single(cls, func):
-        wrapper = marshal_with(cls.default_serializer())(func)
+        wrapper = marshal_with(cls.resource_fields)(func)
         wrapper.__dict__['__swagger_attr'] = cls.operation(func, paginate=False)
         return wrapper
-
-    @classmethod
-    def default_serializer(cls):
-        return cls.resource_fields
 
     def __str__(self):
         return self.__class__.__name__
