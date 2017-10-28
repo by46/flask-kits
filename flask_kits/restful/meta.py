@@ -5,6 +5,9 @@ from sqlalchemy.sql import sqltypes
 
 
 class Meta(type):
+    """
+    Obsoleted
+    """
     MODEL_NAME = '__model_class__'
     IGNORE_FIELDS = '__ignore_fields__'
     EXTRA_FIELDS = '__extra_fields__'

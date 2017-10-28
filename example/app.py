@@ -1,3 +1,4 @@
+# -:- coding:utf8 -:-
 """
 swagger: http://127.0.0.1:5000/api/spec.html
 """
@@ -87,16 +88,17 @@ class User2Api(Resource):
 api.add_resource(User2Api, '/users2')
 
 
-class LoginUser(EntityBase):
+class UserEntity(EntityBase):
     Name = Field('Name', validators=[MinLengthValidator(10)])
     LoginID = Field('LoginID', validators=[MinLengthValidator(2), MaxLengthValidator(20)])
     Password = Field("Password", validators=[MinLengthValidator(8), MaxLengthValidator(16)])
 
 
 class User3Api(Resource):
-    @LoginUser.parameter
+    @UserEntity.parameter
     @UserResponse.single
     def post(self, entity):
+        """新接口测试"""
         print(entity)
 
 
