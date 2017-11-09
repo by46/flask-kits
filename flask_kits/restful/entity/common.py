@@ -40,19 +40,23 @@ class EntityDeclarative(type):
 
         field_names = set()
         resource_fields = dict()
+        extra_fields = []
         for key, field in fields:
             if inspect.isclass(field.type) and issubclass(field.type, EntityBase):
                 resource_fields[key] = flask_restful.fields.Nested(field.type.resource_fields)
                 field.type = field.type.parse
                 field.location = 'json'
-            else:
+            elif field.location == 'json':
                 resource_fields[key] = get_field_type(field.type)
+            else:
+                extra_fields.append(field)
             parser.add_argument(field)
             field_names.add(key)
             del attributes[key]
         attributes['entity_parser'] = parser
         attributes['entity_fields'] = field_names
         attributes['resource_fields'] = resource_fields
+        attributes['extra_fields'] = extra_fields
 
         schema = type.__new__(cls, class_name, bases, attributes)
         # support swagger
@@ -119,6 +123,14 @@ class EntityBase(dict):
             attr = wrapped.__dict__['__swagger_attr'] = f.__dict__['__swagger_attr']
             params = attr.get('parameters', [])
             params.append(post_parameter(cls))
+            for field in cls.extra_fields:
+                params.append({
+                    'name': field.name,
+                    'description': field.name,
+                    'required': field.required,
+                    'dataType': str(field.type),
+                    'paramType': str(field.location)
+                })
         return wrapped
 
     def validate(self):
@@ -132,6 +144,7 @@ class Field(Argument):
     def __init__(self, name, *args, **kwargs):
         kwargs.setdefault('type', text_type)
         self.validators = set()
+        kwargs.setdefault('location', 'json')
         if 'validators' in kwargs:
             self.validators = kwargs.pop('validators')
         super(Field, self).__init__(name, *args, **kwargs)
