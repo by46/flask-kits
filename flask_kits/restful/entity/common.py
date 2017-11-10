@@ -11,9 +11,18 @@ from flask_restful_swagger import swagger
 from six import add_metaclass
 from six import iteritems
 from six import text_type
+from werkzeug.datastructures import FileStorage
 from werkzeug.datastructures import MultiDict
 
 from flask_kits.restful import post_parameter
+
+LOC_JSON = 'json'
+LOC_VALUES = 'values'
+LOC_HEADERS = 'headers'
+LOC_ARGS = 'args'
+LOC_FILES = 'files'
+LOC_FORM = 'form'
+LOC_COOKIES = 'cookies'
 
 MAPPINGS = {
     int: flask_restful.fields.Integer,
@@ -23,11 +32,39 @@ MAPPINGS = {
     Decimal: flask_restful.fields.String,
     bool: flask_restful.fields.Boolean
 }
+SWAGGER_PARAMS = {
+    LOC_HEADERS: 'header',
+    LOC_JSON: 'body',
+    LOC_FILES: 'body',
+    LOC_ARGS: 'query'
+}
+SWAGGER_DATA = {
+    FileStorage: 'file'
+}
 
 
 # optimize this code
 def get_field_type(class_type):
     return MAPPINGS.get(class_type)
+
+
+def swagger_param(param_type):
+    """
+    mapping flask_restful.reqparse.RequestParser to swagger 
+    :param str param_type: 
+    :rtype: str
+    """
+    param_type = param_type.lower()
+    return SWAGGER_PARAMS.get(param_type, 'body')
+
+
+def swagger_data(data_type):
+    """
+    
+    :param data_type: 
+    :return: 
+    """
+    return SWAGGER_DATA.get(data_type) or str(data_type)
 
 
 class EntityDeclarative(type):
@@ -121,15 +158,17 @@ class EntityBase(dict):
         # Support swagger document
         if '__swagger_attr' in f.__dict__:
             attr = wrapped.__dict__['__swagger_attr'] = f.__dict__['__swagger_attr']
+            attr['consumes'] = ["multipart/form-data", 'application/json']
             params = attr.get('parameters', [])
-            params.append(post_parameter(cls))
+            if cls.resource_fields:
+                params.append(post_parameter(cls))
             for field in cls.extra_fields:
                 params.append({
                     'name': field.name,
                     'description': field.name,
                     'required': field.required,
-                    'dataType': str(field.type),
-                    'paramType': str(field.location)
+                    'dataType': swagger_data(field.type),
+                    'paramType': swagger_param(field.location)
                 })
         return wrapped
 

@@ -2,7 +2,13 @@ from decimal import Decimal
 
 from dateutil.parser import parse
 
-LITERAL = {'false': False, 'true': True}
+LITERAL = {
+    'false': False,
+    'true': True,
+    '0': False,
+    '1': True,
+    't': True,
+    'f': False}
 
 
 def compatible_bool(value):
