@@ -94,6 +94,11 @@ class Response(object):
         return decorator
 
     @classmethod
+    def authorization_parameter(cls, func):
+        decorator = cls.parameter(name='Authorization', data_type='str', param_type='header', required=True)
+        return decorator(func)
+
+    @classmethod
     def entity_parameter(cls, entity_name):
         def wrapper(func):
             attr = func.__dict__['__swagger_attr']

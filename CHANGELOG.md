@@ -1,5 +1,9 @@
 # Change log
 
+## [0.0.11]
+### Added
+- Add authorization parameter utils method
+
 ## [0.0.7]
 ### Fix
 - change parameter decorator
