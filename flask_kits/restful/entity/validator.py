@@ -1,4 +1,7 @@
+import re
 from decimal import Decimal
+
+import six
 
 
 class Validator(object):
@@ -74,4 +77,23 @@ class PrecisionValidator(CompareValidator):
 
 class PasswordValidator(Validator):
     def validate(self, value):
+        return True
+
+
+class RegexValidator(Validator):
+    help = "String length must be match the regex {0}"
+
+    def __init__(self, line):
+        self.conditions = []
+        if isinstance(line, six.string_types):
+            self.conditions = [re.compile(line, re.MULTILINE)]
+        elif isinstance(line, (list, tuple)):
+            self.conditions = [re.compile(x, re.MULTILINE) for x in line if x]
+        else:
+            self.conditions = [line]
+
+    def validate(self, value):
+        for condition in self.conditions:
+            if not re.match(condition, value):
+                return self.handle_error(condition.pattern)
         return True
