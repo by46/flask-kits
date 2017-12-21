@@ -1,6 +1,5 @@
 from flask_restful import fields
 from flask_restful import marshal_with
-from flask_restful.fields import Raw
 from flask_restful_swagger import swagger
 from six import add_metaclass
 from six import iteritems
@@ -52,8 +51,16 @@ class ResponseDeclarative(type):
                 if not field_type:
                     field_type = fields.String
                 resource_fields[column.name] = field_type
-        extra_fields = {name: field for name, field in iteritems(attributes) if
-                        not name.startswith('_') and issubclass(field, Raw)}
+        extra_fields = {}
+        for name, field in iteritems(attributes):
+            if name.startswith('_'):
+                continue
+
+            if isinstance(field, (fields.Nested,)):
+                extra_fields[name] = field
+            elif isinstance(type(field), type) and issubclass(field, fields.Raw):
+                extra_fields[name] = field
+
         resource_fields.update(extra_fields)
         s = type.__new__(cls, name, bases, class_dict)
         swagger.add_model(s)
