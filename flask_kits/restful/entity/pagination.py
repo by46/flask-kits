@@ -66,6 +66,11 @@ class Pagination(object):
         code = 206 if rowcount == self.limit else 200
         h = {'Accept-Range': ','.join(self.ORDERS)}
         if code == 206:
+            content_range = '{order_by} {start}..{end}'.format(
+                order_by=self.order_by,
+                start=self.start,
+                end=self.start + rowcount)
+
             start = self.start + self.limit
             end = start + self.limit
             next_range = '{order_by} {start}..{end};order={order},max={limit}'.format(
@@ -76,11 +81,6 @@ class Pagination(object):
                 limit=self.limit
             )
             h['Next-Range'] = next_range
-
-            content_range = '{order_by} {start}..{end}'.format(
-                order_by=self.order_by,
-                start=start,
-                end=start + rowcount)
             h['Content-Range'] = content_range
 
         return code, h
