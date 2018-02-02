@@ -6,7 +6,9 @@ class ISODateTime(fields.DateTime):
         super(ISODateTime, self).__init__(dt_format="iso8601")
 
     def format(self, value):
-        return super(ISODateTime, self).format(value) + "Z"
+        line = super(ISODateTime, self).format(value)
+        line = line[:26]
+        return line + "Z"
 
 
 class RFC822DateTime(fields.DateTime):
