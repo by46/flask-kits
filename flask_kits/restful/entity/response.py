@@ -56,7 +56,7 @@ class ResponseDeclarative(type):
             if name.startswith('_'):
                 continue
 
-            if isinstance(field, (fields.Nested,)):
+            if isinstance(field, (fields.Raw,)):
                 extra_fields[name] = field
             elif isinstance(type(field), type) and issubclass(field, fields.Raw):
                 extra_fields[name] = field

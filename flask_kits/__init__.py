@@ -7,7 +7,7 @@ from flask_kits.routing import KitRule
 from . import sms
 
 __author__ = 'benjamin.c.yan'
-__version__ = '0.0.21'
+__version__ = '0.0.22'
 
 missing = object()
 
