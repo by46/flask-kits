@@ -1,6 +1,6 @@
 Bunch
 Python-DateUtil
-Flask
+Flask==0.12.2
 Flask-Login
 Flask-Menu
 Flask-Restful
