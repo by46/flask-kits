@@ -62,15 +62,18 @@ class Pagination(object):
         except Exception:
             raise InvalidFormatError()
 
-    def status_and_headers(self, rowcount):
+    def status_and_headers(self, rowcount, total_count=None):
         code = 206 if rowcount == self.limit else 200
         h = {'Accept-Range': ','.join(self.ORDERS)}
-        if code == 206:
-            content_range = '{order_by} {start}..{end}'.format(
-                order_by=self.order_by,
-                start=self.start,
-                end=self.start + rowcount)
+        total = '*' if total_count is None else total_count
+        content_range = '{order_by} {start}..{end}/{total}'.format(
+            order_by=self.order_by,
+            start=self.start,
+            end=self.start + rowcount,
+            total=total)
+        h['Content-Range'] = content_range
 
+        if code == 206:
             start = self.start + self.limit
             end = start + self.limit
             next_range = '{order_by} {start}..{end};order={order},max={limit}'.format(
@@ -81,10 +84,13 @@ class Pagination(object):
                 limit=self.limit
             )
             h['Next-Range'] = next_range
-            h['Content-Range'] = content_range
 
         return code, h
 
     @classmethod
     def default(cls):
         return cls()
+
+    @property
+    def order_string(self):
+        return "{0} {1}".format(self.order_by, self.order)
